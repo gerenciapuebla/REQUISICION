@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Requisición · Safari Indoor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --steel-900:#202B31;
+    --steel-800:#2B3944;
+    --steel-700:#3D4F5B;
+    --steel-500:#647985;
+    --steel-200:#C7D2D6;
+    --paper:#F3EFE4;
+    --ink:#20201C;
+    --orange:#E8632C;
+    --green:#3F7D58;
+    --red:#B84A3E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--steel-900);
+    color:var(--paper);
+    font-family:'JetBrains Mono', monospace;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    letter-spacing:.22em;
+    font-size:12px;
+    text-transform:uppercase;
+    color:var(--orange);
+    margin:0 0 4px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:30px;
+    letter-spacing:.01em;
+    margin:0 0 24px;
+    color:var(--paper);
+    border-bottom:3px solid var(--orange);
+    padding-bottom:14px;
+  }
+  .card{
+    background:var(--steel-800);
+    border:1px solid var(--steel-700);
+    border-radius:4px;
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .card-label{
+    font-family:'Oswald',sans-serif;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--steel-200);
+    margin:0 0 10px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-family:'Oswald',sans-serif;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--steel-500);
+    margin-bottom:6px;
+  }
+  input[type=text], input[type=number], select, textarea{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--steel-900);
+    border:1px solid var(--steel-700);
+    color:var(--paper);
+    border-radius:3px;
+    padding:9px 10px;
+    font-size:14px;
+    width:100%;
+  }
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%, var(--steel-200) 50%),linear-gradient(135deg, var(--steel-200) 50%,transparent 50%);background-position:calc(100% - 16px) center, calc(100% - 11px) center;background-size:5px 5px,5px 5px;background-repeat:no-repeat;}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--orange);outline-offset:1px;}
+  input::placeholder, textarea::placeholder{color:var(--steel-500);}
+
+  .item-row{
+    display:grid;
+    grid-template-columns:1fr 70px 90px 32px;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:center;
+  }
+  .item-row input[type=number]{text-align:center;}
+  .del-btn{
+    background:transparent;border:none;color:var(--steel-500);
+    cursor:pointer;font-size:18px;line-height:1;padding:4px;
+  }
+  .del-btn:hover{color:var(--red);}
+  .col-headers{
+    display:grid;grid-template-columns:1fr 70px 90px 32px;gap:8px;
+    font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--steel-500);margin-bottom:6px;
+  }
+
+  .add-link{
+    background:transparent;border:1px dashed var(--steel-500);color:var(--steel-200);
+    width:100%;padding:9px;border-radius:3px;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;font-size:13px;
+    margin-top:4px;
+  }
+  .add-link:hover{border-color:var(--orange);color:var(--orange);}
+
+  .btn{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    font-size:13px;
+    border:none;
+    border-radius:3px;
+    padding:11px 18px;
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+  .btn:hover{filter:brightness(1.1);}
+  .btn-primary{background:var(--orange);color:var(--steel-900);}
+  .btn-ghost{background:transparent;color:var(--steel-200);border:1px solid var(--steel-500);}
+  .btn-ghost:hover{color:var(--paper);border-color:var(--paper);}
+
+  .hint{font-size:12px;color:var(--steel-500);margin-top:8px;line-height:1.5;}
+
+  .preview-wrap{text-align:center;margin-top:14px;}
+  .preview-wrap img{max-width:100%;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .action-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .action-row .btn{flex:1;min-width:140px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--orange);color:var(--steel-900);padding:10px 18px;
+    border-radius:4px;font-family:'Oswald',sans-serif;font-weight:600;
+    font-size:13px;letter-spacing:.04em;box-shadow:0 6px 20px rgba(0,0,0,.4);
+    opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Safari Indoor · Puebla</p>
+  <h1>Requisición de faltantes</h1>
+
+  <div class="card">
+    <p class="card-label">Datos generales</p>
+    <div class="field">
+      <label>Solicita</label>
+      <input type="text" id="solicitante" placeholder="Nombre de quien solicita">
+    </div>
+    <div class="field">
+      <label>Área</label>
+      <select id="area">
+        <option value="Ventas">Ventas / Piso</option>
+        <option value="Rango de tiro">Rango de tiro</option>
+        <option value="Arquería">Arquería</option>
+        <option value="Bodega">Bodega / Inventario</option>
+        <option value="Mantenimiento">Mantenimiento</option>
+        <option value="Administración">Administración</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-label">Artículos faltantes</p>
+    <div class="col-headers">
+      <span>Artículo</span><span>Cant.</span><span>Urgencia</span><span></span>
+    </div>
+    <div id="itemsList"></div>
+    <button class="add-link" id="addItemBtn">+ Agregar artículo</button>
+  </div>
+
+  <div class="card">
+    <p class="card-label">Notas adicionales</p>
+    <textarea id="notas" rows="3" placeholder="Ej. proveedor sugerido, para qué se necesita, fecha límite..."></textarea>
+  </div>
+
+  <button class="btn btn-primary" id="generarBtn" style="width:100%;">Generar requisición e imagen</button>
+  <p class="hint">Se genera una imagen tipo ticket con todo lo solicitado, lista para enviar por WhatsApp al gerente. Esta herramienta no guarda historial: cada vez que la abres empieza en blanco.</p>
+
+  <div class="card" id="previewCard" style="display:none; margin-top:16px;">
+    <p class="card-label">Requisición generada</p>
+    <div class="preview-wrap"><img id="previewImg" alt="Requisición de faltantes"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="shareBtn">Compartir por WhatsApp</button>
+      <button class="btn btn-ghost" id="downloadBtn">Descargar imagen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="ticketCanvas" style="display:none;"></canvas>
+
+<script>
+const STORE_NAME = 'SAFARI INDOOR PUEBLA';
+const STORE_SUB = 'C.C. Explanada · Requisición de Faltantes';
+const URGENCIAS = ['Normal','Urgente'];
+
+let items = [];
+const uid = () => Math.random().toString(36).slice(2,9);
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+function addItemRow(){
+  items.push({id: uid(), articulo:'', cantidad:'', urgencia:'Normal'});
+}
+
+function renderItems(){
+  const list = document.getElementById('itemsList');
+  list.innerHTML = '';
+  items.forEach(it=>{
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Ej. municiones .177" value="${escapeAttr(it.articulo)}" data-id="${it.id}" data-field="articulo">
+      <input type="number" min="0" placeholder="0" value="${it.cantidad}" data-id="${it.id}" data-field="cantidad">
+      <select data-id="${it.id}" data-field="urgencia">
+        ${URGENCIAS.map(u=>`<option value="${u}" ${u===it.urgencia?'selected':''}>${u}</option>`).join('')}
+      </select>
+      <button class="del-btn" data-id="${it.id}" title="Eliminar">×</button>
+    `;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll('input, select').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const {id, field} = e.target.dataset;
+      const it = items.find(x=>x.id===id);
+      if(it) it[field] = e.target.value;
+    });
+  });
+  list.querySelectorAll('.del-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const id = e.target.dataset.id;
+      items = items.filter(it=>it.id!==id);
+      if(items.length===0) addItemRow();
+      renderItems();
+    });
+  });
+}
+
+function escapeAttr(str){
+  return String(str??'').replace(/"/g,'&quot;');
+}
+
+document.getElementById('addItemBtn').addEventListener('click', ()=>{
+  addItemRow();
+  renderItems();
+});
+
+document.getElementById('generarBtn').addEventListener('click', ()=>{
+  const solicitante = document.getElementById('solicitante').value.trim();
+  const area = document.getElementById('area').value;
+  const notas = document.getElementById('notas').value.trim();
+
+  const itemsValidos = items.filter(it => it.articulo.trim() !== '');
+  if(itemsValidos.length === 0){
+    showToast('Agrega al menos un artículo');
+    return;
+  }
+  if(!solicitante){
+    showToast('Indica quién solicita');
+    return;
+  }
+
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'});
+  const hora = now.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+
+  const reg = {
+    solicitante, area, notas, fecha: fecha + ' ' + hora,
+    items: itemsValidos.map(it=>({
+      articulo: it.articulo.trim(),
+      cantidad: it.cantidad || '1',
+      urgencia: it.urgencia
+    }))
+  };
+
+  const dataUrl = drawTicket(reg);
+  document.getElementById('previewImg').src = dataUrl;
+  document.getElementById('previewCard').style.display = 'block';
+  document.getElementById('previewCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+  window._lastTicketDataUrl = dataUrl;
+  showToast('Requisición generada');
+});
+
+function drawTicket(reg){
+  const canvas = document.getElementById('ticketCanvas');
+  const W = 720;
+  const lineH = 36;
+  const headerH = 190;
+  const itemsH = Math.max(reg.items.length,1) * lineH + 60;
+  const notasH = reg.notas ? wrapLines(reg.notas, 60).length * 22 + 60 : 0;
+  const footerH = 80;
+  const H = headerH + itemsH + notasH + footerH;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#F3EFE4';
+  ctx.fillRect(0,0,W,H);
+  drawPerforation(ctx, W, 0);
+
+  let y = 36;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#20201C';
+  ctx.font = '700 30px Oswald, sans-serif';
+  ctx.fillText(STORE_NAME, W/2, y+24);
+  y += 40;
+  ctx.font = '500 14px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#647985';
+  ctx.fillText(STORE_SUB, W/2, y+14);
+  y += 34;
+
+  dashedLine(ctx, 40, y, W-40);
+  y += 26;
+
+  ctx.textAlign = 'left';
+  ctx.font = '500 15px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#20201C';
+  ctx.fillText('Solicita: ' + reg.solicitante, 40, y);
+  ctx.textAlign = 'right';
+  ctx.fillText(reg.fecha, W-40, y);
+  y += 26;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#647985';
+  ctx.fillText('Área: ' + reg.area, 40, y);
+  y += 30;
+
+  dashedLine(ctx, 40, y, W-40);
+  y += 30;
+
+  ctx.font = '600 15px Oswald, sans-serif';
+  ctx.fillStyle = '#647985';
+  ctx.fillText('ARTÍCULOS SOLICITADOS', 40, y);
+  y += 30;
+
+  reg.items.forEach(it=>{
+    const urgente = it.urgencia === 'Urgente';
+    ctx.textAlign = 'left';
+    ctx.font = '400 15px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#20201C';
+    ctx.fillText(truncate(it.articulo, 36), 50, y);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#647985';
+    ctx.font = '500 14px "JetBrains Mono", monospace';
+    ctx.fillText('x' + it.cantidad, W-160, y);
+
+    if(urgente){
+      ctx.fillStyle = '#B84A3E';
+      roundRect(ctx, W-140, y-18, 100, 24, 4);
+      ctx.fill();
+      ctx.fillStyle = '#F3EFE4';
+      ctx.textAlign = 'center';
+      ctx.font = '700 11px Oswald, sans-serif';
+      ctx.fillText('URGENTE', W-90, y-1);
+    } else {
+      ctx.fillStyle = '#3F7D58';
+      ctx.textAlign = 'right';
+      ctx.font = '500 12px Oswald, sans-serif';
+      ctx.fillText('normal', W-40, y-1);
+    }
+    y += lineH;
+  });
+
+  y += 10;
+  dashedLine(ctx, 40, y, W-40);
+  y += 30;
+
+  if(reg.notas){
+    ctx.textAlign = 'left';
+    ctx.font = '600 14px Oswald, sans-serif';
+    ctx.fillStyle = '#647985';
+    ctx.fillText('NOTAS', 40, y);
+    y += 22;
+    ctx.font = '400 14px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#20201C';
+    wrapLines(reg.notas, 60).forEach(line=>{
+      ctx.fillText(line, 40, y);
+      y += 22;
+    });
+    y += 14;
+  }
+
+  ctx.textAlign = 'center';
+  ctx.font = '400 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#647985';
+  ctx.fillText('Generado el ' + reg.fecha, W/2, y);
+  y += 20;
+
+  drawPerforation(ctx, W, H-14);
+  return canvas.toDataURL('image/png');
+}
+
+function wrapLines(text, maxChars){
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  words.forEach(w=>{
+    if((current + ' ' + w).trim().length > maxChars){
+      lines.push(current.trim());
+      current = w;
+    } else {
+      current += ' ' + w;
+    }
+  });
+  if(current.trim()) lines.push(current.trim());
+  return lines;
+}
+
+function drawPerforation(ctx, W, yBase){
+  const r = 6;
+  for(let x = r*2; x < W; x += r*2.4){
+    ctx.beginPath();
+    ctx.arc(x, yBase===0? -r/1.4 : yBase+14+r/1.4, r, 0, Math.PI*2);
+    ctx.fillStyle = '#20202020';
+    ctx.fill();
+  }
+}
+
+function dashedLine(ctx, x1, y, x2){
+  ctx.save();
+  ctx.strokeStyle = '#647985';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(x1,y);
+  ctx.lineTo(x2,y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function truncate(str, n){
+  return str.length>n ? str.slice(0,n-1)+'…' : str;
+}
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const a = document.createElement('a');
+  a.href = window._lastTicketDataUrl;
+  a.download = `requisicion-${Date.now()}.png`;
+  a.click();
+});
+
+document.getElementById('shareBtn').addEventListener('click', async ()=>{
+  try{
+    const res = await fetch(window._lastTicketDataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], `requisicion-${Date.now()}.png`, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({
+        files:[file],
+        title:'Requisición de faltantes',
+        text:'Requisición de faltantes · Safari Indoor Puebla'
+      });
+    }else{
+      showToast('Tu navegador no permite compartir directo. Descarga la imagen y adjúntala en WhatsApp.');
+    }
+  }catch(e){
+    if(e.name !== 'AbortError'){
+      showToast('No se pudo compartir. Descarga la imagen y adjúntala manualmente.');
+    }
+  }
+});
+
+addItemRow();
+renderItems();
+</script>
+</body>
+</html>
